@@ -234,6 +234,7 @@ export class GitHub1sFS implements FileSystemProvider, Disposable {
 									throw FileSystemError.FileNotADirectory(uri);
 								}
 								parent.entries = entriesToMap(entries, uri);
+								console.log(parent);
 								return parent.getNameTypePairs();
 							});
 					});
@@ -258,6 +259,7 @@ export class GitHub1sFS implements FileSystemProvider, Disposable {
 			throw FileSystemError.FileNotFound(uri);
 		}
 		return this._lookupAsFile(uri, false).then(file => {
+			console.log('_lookupAsFile:', { file });
 			if (file.data !== null) {
 				return file.data;
 			}
@@ -268,7 +270,7 @@ export class GitHub1sFS implements FileSystemProvider, Disposable {
 			 *   2. The GraphQL query is enabled, but the blob/file is binary
 			 */
 			return readGitHubFile(uri, file.sha).then(blob => {
-				console.log('readGitHubFile:', uri);
+				console.log('readGitHubFile:', uri, file.sha);
 				file.data = decodeBase64(blob.content);
 				return file.data;
 			});

@@ -69,6 +69,7 @@ export const readGitHubDirectory = (uri: vscode.Uri) => {
 };
 
 export const readGitHubFile = (uri: vscode.Uri, fileSha: string) => {
+	console.log('readGitHubFile', uri, fileSha);
 	return parseUriWithRest(uri).then((state) => {
 		return fetch(`https://api.github.com/repos/${state.owner}/${state.repo}/git/blobs/${fileSha}`)
 			.catch(handleRequestError);

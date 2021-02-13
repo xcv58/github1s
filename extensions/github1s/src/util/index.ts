@@ -68,7 +68,7 @@ export const getWebviewOptions = (extensionUri: vscode.Uri): vscode.WebviewOptio
 };
 
 export const splitPathByBranchName = (pathname: string, branchNames: string[]) => {
-	const branchNameSet = new Set(branchNames);
+	const branchNameSet = new Set([...branchNames, 'HEAD']);
 	const parts = pathname.split('/').filter(Boolean);
 	console.log({ parts, branchNameSet });
 	let branch;
@@ -82,5 +82,5 @@ export const splitPathByBranchName = (pathname: string, branchNames: string[]) =
 			];
 		}
 	}
-	return [];
+	return ['HEAD', '/' + pathname];
 };
