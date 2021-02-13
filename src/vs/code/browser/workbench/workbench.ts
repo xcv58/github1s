@@ -401,7 +401,7 @@ class WindowIndicator implements IWindowIndicator {
 (function () {
 	const route = parseGitHubUrl(window.location.href);
 	const config: IWorkbenchConstructionOptions & { folderUri?: UriComponents, workspaceUri?: UriComponents } = {
-		folderUri: URI.from({ scheme: "github1s", path: '/', authority: `${route.owner}+${route.repo}+${route.branch}` }),
+		folderUri: URI.from({ scheme: "github1s", path: '/', authority: `${route.owner}+${route.repo}+${route.path}` }),
 		staticExtensions: [],
 		enableSyncByDefault: false,
 		webWorkerExtensionHostIframeSrc: document.getElementById('vscode-extension-host-iframe-src')?.getAttribute('data-settings') as string,

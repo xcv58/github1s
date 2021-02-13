@@ -54,7 +54,8 @@ export const parseUriWithRest = (uri: vscode.Uri): Promise<UriState> => {
 				owner,
 				repo,
 				branch,
-				path: uri.path === '/' ? uri.path : path
+				// path: uri.path === '/' ? uri.path : path
+				path: path
 			};
 		})
 		.catch(handleRequestError);

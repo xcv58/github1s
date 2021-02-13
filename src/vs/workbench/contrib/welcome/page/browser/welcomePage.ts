@@ -72,7 +72,7 @@ export class WelcomePageContribution implements IWorkbenchContribution {
 			const route = parseGitHubUrl(window.location.href);
 			const activeResource = editorService.activeEditor?.resource;
 			if (route.path !== '/' && (!activeResource || activeResource.scheme === 'github1s' || activeResource.path !== route.path)) {
-				const file = URI.from({ scheme: 'github1s', authority: `${route.owner}+${route.repo}+${route.branch}`, path: route.path });
+				const file = URI.from({ scheme: 'github1s', authority: `${route.owner}+${route.repo}`, path: route.path });
 				fileService.resolve(file)
 					.then(() => this.commandService.executeCommand(route.type === 'tree' ? 'revealInExplorer' : 'vscode.open', file))
 					.then(() => this.registerListeners(), () => this.registerListeners());

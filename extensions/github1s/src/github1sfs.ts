@@ -120,7 +120,8 @@ const parseUriWithBranchQuery = (uri: Uri) => {
 			owner,
 			repo,
 			branch,
-			path: uri.path === '/' ? uri.path : path
+			// path: uri.path === '/' ? uri.path : path
+			path: path
 		};
 	});
 };
