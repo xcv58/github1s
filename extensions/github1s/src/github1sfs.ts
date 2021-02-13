@@ -15,9 +15,9 @@ import {
 	FileType,
 	Uri,
 } from 'vscode';
-import { noop, dirname, reuseable, hasValidToken } from './util';
-import { parseUri, readGitHubDirectory, readGitHubFile } from './api';
-import { apolloClient, githubObjectQuery } from './client';
+import { noop, dirname, reuseable, hasValidToken, splitPathByBranchName } from './util';
+import { readGitHubDirectory, readGitHubFile } from './api';
+import { apolloClient, githubObjectQuery, refsQuery } from './client';
 import { toUint8Array as decodeBase64 } from 'js-base64';
 
 const textEncoder = new TextEncoder();
@@ -100,6 +100,29 @@ const entriesToMap = (entries, uri) => {
 		map.set(item.name, entry);
 	});
 	return map;
+};
+
+const parseUriWithBranchQuery = (uri: Uri) => {
+	const [owner, repo, pathname] = (uri.authority || '').split('+').filter(Boolean);
+	return apolloClient.query({
+		query: refsQuery,
+		variables: {
+			owner,
+			repo
+		}
+	}).then((response) => {
+		const nodes = response.data?.repository?.refs?.nodes;
+		if (nodes === null) {
+			throw FileSystemError.FileNotFound(uri);
+		}
+		const [branch, path] = splitPathByBranchName(pathname, nodes.map(x => x.name));
+		return {
+			owner,
+			repo,
+			branch,
+			path: uri.path === '/' ? uri.path : path
+		};
+	});
 };
 
 export class GitHub1sFS implements FileSystemProvider, Disposable {
@@ -189,22 +212,30 @@ export class GitHub1sFS implements FileSystemProvider, Disposable {
 			}
 
 			if (hasValidToken() && ENABLE_GRAPH_SQL) {
-				const state = parseUri(uri);
-				const directory = state.path.substring(1);
-				return apolloClient.query({
-					query: githubObjectQuery, variables: {
-						owner: state.owner,
-						repo: state.repo,
-						expression: `${state.branch}:${directory}`
-					}
-				})
-					.then((response) => {
-						const entries = response.data?.repository?.object?.entries;
-						if (!entries) {
-							throw FileSystemError.FileNotADirectory(uri);
+				console.log('uri:', uri);
+				return parseUriWithBranchQuery(uri)
+					.then((state) => {
+						console.log({ state });
+						if (uri.path === '/') {
+							state.path = '';
 						}
-						parent.entries = entriesToMap(entries, uri);
-						return parent.getNameTypePairs();
+						console.log('path:', state.path);
+						const directory = state.path.substring(1);
+						return apolloClient.query({
+							query: githubObjectQuery, variables: {
+								owner: state.owner,
+								repo: state.repo,
+								expression: `${state.branch}:${directory}`
+							}
+						})
+							.then((response) => {
+								const entries = response.data?.repository?.object?.entries;
+								if (!entries) {
+									throw FileSystemError.FileNotADirectory(uri);
+								}
+								parent.entries = entriesToMap(entries, uri);
+								return parent.getNameTypePairs();
+							});
 					});
 			}
 			return readGitHubDirectory(uri).then(data => {
@@ -237,6 +268,7 @@ export class GitHub1sFS implements FileSystemProvider, Disposable {
 			 *   2. The GraphQL query is enabled, but the blob/file is binary
 			 */
 			return readGitHubFile(uri, file.sha).then(blob => {
+				console.log('readGitHubFile:', uri);
 				file.data = decodeBase64(blob.content);
 				return file.data;
 			});

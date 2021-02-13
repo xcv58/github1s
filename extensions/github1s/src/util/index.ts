@@ -66,3 +66,21 @@ export const getWebviewOptions = (extensionUri: vscode.Uri): vscode.WebviewOptio
 		localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'assets')]
 	};
 };
+
+export const splitPathByBranchName = (pathname: string, branchNames: string[]) => {
+	const branchNameSet = new Set(branchNames);
+	const parts = pathname.split('/').filter(Boolean);
+	console.log({ parts, branchNameSet });
+	let branch;
+	for (const part of parts) {
+		branch = branch ? `${branch}/${part}` : part;
+		console.log({ branch }, branchNameSet.has(branch));
+		if (branchNameSet.has(branch)) {
+			return [
+				branch,
+				parts.join('/').substring(branch.length)
+			];
+		}
+	}
+	return [];
+};

@@ -80,6 +80,27 @@ query objectQuery($owner: String!, $repo: String!, $expression: String!) {
 }
 `;
 
+/**
+ * Query to get first 100 branch name
+ */
+export const refsQuery = gql`
+query refsQuery($owner: String!, $repo: String!) {
+  repository(name: $repo, owner: $owner) {
+    id
+    defaultBranchRef {
+      name
+      prefix
+    }
+    refs(refPrefix: "refs/heads/" first: 100) {
+      totalCount
+      nodes {
+        name
+      }
+    }
+  }
+}
+`;
+
 export const apolloClient = new ApolloClient({
 	link: authLink.concat(httpLink),
 	cache: new InMemoryCache()

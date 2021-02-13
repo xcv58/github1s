@@ -23,7 +23,7 @@ export const parseGitHubUrl = (url: string): GitHubRouteState => {
 		owner: parts[0] || 'conwnet',
 		repo: parts[1] || 'github1s',
 		type: (hasFileType ? parts[2] : 'tree').toLowerCase(),
-		branch: hasBranchName ? parts[3] : 'HEAD',
+		branch: hasBranchName ? parts.slice(3).join('/'): 'HEAD',
 		path: '/' + (hasBranchName ? parts.slice(4).join('/') : ''),
 		search: urlObj.search || '',
 		hash: urlObj.hash || ''

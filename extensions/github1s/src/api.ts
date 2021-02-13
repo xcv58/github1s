@@ -4,6 +4,7 @@
  */
 
 import * as vscode from 'vscode';
+import { splitPathByBranchName } from './util';
 import { fetch, RequestError, RequestRateLimitError, RequestInvalidTokenError, RequestNotFoundError, throttledReportNetworkError } from './util/fetch';
 
 interface UriState {
@@ -42,16 +43,36 @@ const handleRequestError = (error: RequestError) => {
 	throw vscode.FileSystemError.Unavailable(error.message || 'Unknown Error Occurred When Request To GitHub');
 };
 
-export const readGitHubDirectory = (uri: vscode.Uri) => {
-	const state: UriState = parseUri(uri);
-	return fetch(`https://api.github.com/repos/${state.owner}/${state.repo}/git/trees/${state.branch}${state.path.replace(/^\//, ':')}`)
+export const parseUriWithRest = (uri: vscode.Uri): Promise<UriState> => {
+	const [owner, repo, pathname] = (uri.authority || '').split('+').filter(Boolean);
+	// TODO: cache the data to aovid additional API call
+	return fetch(`https://api.github.com/repos/${owner}/${repo}/branches`)
+		.then((response) => {
+			const branchNames = response.map(x => x.name);
+			const [branch, path] = splitPathByBranchName(pathname, branchNames);
+			return {
+				owner,
+				repo,
+				branch,
+				path: uri.path === '/' ? uri.path : path
+			};
+		})
 		.catch(handleRequestError);
 };
 
+
+export const readGitHubDirectory = (uri: vscode.Uri) => {
+	return parseUriWithRest(uri).then((state) => {
+		return fetch(`https://api.github.com/repos/${state.owner}/${state.repo}/git/trees/${state.branch}${state.path.replace(/^\//, ':')}`)
+			.catch(handleRequestError);
+	});
+};
+
 export const readGitHubFile = (uri: vscode.Uri, fileSha: string) => {
-	const state: UriState = parseUri(uri);
-	return fetch(`https://api.github.com/repos/${state.owner}/${state.repo}/git/blobs/${fileSha}`)
-		.catch(handleRequestError);
+	return parseUriWithRest(uri).then((state) => {
+		return fetch(`https://api.github.com/repos/${state.owner}/${state.repo}/git/blobs/${fileSha}`)
+			.catch(handleRequestError);
+	});
 };
 
 export const validateToken = (token: string) => {
