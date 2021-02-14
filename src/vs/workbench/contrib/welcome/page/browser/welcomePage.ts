@@ -47,7 +47,7 @@ import { IEditorOptions } from 'vs/platform/editor/common/editor';
 import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import { IViewletService } from 'vs/workbench/services/viewlet/browser/viewlet';
 import { buttonBackground, buttonHoverBackground, welcomePageBackground } from 'vs/workbench/contrib/welcome/page/browser/welcomePageColors';
-import { parseGitHubUrl } from 'vs/github1s/util';
+import { parseGitHubUrl, getGitHubRepoInfo } from 'vs/github1s/util';
 
 const configurationKey = 'workbench.startupEditor';
 const oldConfigurationKey = 'workbench.welcome.enabled';
@@ -128,19 +128,34 @@ export class WelcomePageContribution implements IWorkbenchContribution {
 		return uri.path.startsWith('/') ? uri.path : `/${uri.path}`;
 	}
 
+	getGitHubBranches(url: string) {
+		const { owner, repo } = getGitHubRepoInfo(url);
+		console.log('getGitHubBranches', { owner, repo });
+		return this.commandService.executeCommand('github1s.get-github-branches', owner, repo);
+	}
+
 	private doUpdateWindowUrl(): void {
 		// context.globalState.get('github-oauth-token') as string || ''
 		const state = parseGitHubUrl(window.location.href);
-		const editor = this.editorService.activeEditor;
-		const filePath = this.getGitHubFilePathOrEmpty(editor?.resource);
-		// if no file opened and the branch is HEAD current, only retain owner and repo in url
-		// TODO: figure out how to get branch name here
-		const windowUrl = !filePath
-			? `/${state.owner}/${state.repo}`
-			: `/${state.owner}/${state.repo}/${filePath ? 'blob' : 'tree'}/branch${filePath}`;
-		if (window.history.replaceState) {
-			window.history.replaceState(null, '', windowUrl);
-		}
+
+		return getGitHubBranches(wondow.location.href).then(
+			branches => {
+				console.log('branches:', branche);
+				return branches.map(x => x.name);
+			}
+		).then(names => {
+			console.log('branches name:', names);
+			const editor = this.editorService.activeEditor;
+			const filePath = this.getGitHubFilePathOrEmpty(editor?.resource);
+			// if no file opened and the branch is HEAD current, only retain owner and repo in url
+			// TODO: figure out how to get branch name here
+			const windowUrl = !filePath
+				? `/${state.owner}/${state.repo}`
+				: `/${state.owner}/${state.repo}/${filePath ? 'blob' : 'tree'}/branch${filePath}`;
+			if (window.history.replaceState) {
+				window.history.replaceState(null, '', windowUrl);
+			}
+		});
 	}
 
 	private registerListeners() {
@@ -400,6 +415,10 @@ class WelcomePage extends Disposable {
 				}
 			}
 		}));
+		console.log('get branches', window.location.href);
+		this.getGitHubBranches(window.location.href).then(branches => {
+			console.log('branches:', branches);
+		});
 	}
 
 	registerGitHub1sListeners(container: HTMLElement) {
@@ -426,6 +445,12 @@ class WelcomePage extends Disposable {
 
 	getGitHubTokenStatus() {
 		return this.commandService.executeCommand('github1s.validate-token', true);
+	}
+
+	getGitHubBranches(url: string) {
+		const { owner, repo } = getGitHubRepoInfo(url);
+		console.log('getGitHubBranches', { owner, repo });
+		return this.commandService.executeCommand('github1s.get-github-branches', owner, repo);
 	}
 
 	refreshGitHubTokenStatus(container: HTMLElement) {

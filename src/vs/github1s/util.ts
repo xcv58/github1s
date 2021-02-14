@@ -30,3 +30,12 @@ export const parseGitHubUrl = (url: string): GitHubRouteState => {
 		hash: urlObj.hash || ''
 	};
 };
+
+export const getGitHubRepoInfo = (url: string) => {
+	const urlObj = new window.URL(url);
+	const parts = urlObj.pathname.split(/\/|%2F/g).filter(Boolean);
+	return {
+		owner: parts[0] || 'conwnet',
+		repo: parts[1] || 'github1s',
+	};
+};

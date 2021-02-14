@@ -102,7 +102,7 @@ const entriesToMap = (entries, uri) => {
 	return map;
 };
 
-const parseUriWithBranchQuery = (uri: Uri): Promise<UriState> => {
+export const parseUriWithBranchQuery = (uri: Uri): Promise<UriState> => {
 	const [owner, repo, pathname] = (uri.authority || '').split('+').filter(Boolean);
 	return apolloClient.query({
 		query: refsQuery,

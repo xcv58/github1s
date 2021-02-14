@@ -4,8 +4,9 @@
  */
 
 import * as vscode from 'vscode';
-import { getExtensionContext } from './util';
-import { validateToken } from './api';
+import { getExtensionContext, hasValidToken, reuseable } from './util';
+import { getGitHubBranches, validateToken } from './api';
+import { getBranches } from './github-gql-api';
 
 export const commandValidateToken = (silent: boolean = false) => {
 	const context = getExtensionContext();
@@ -32,6 +33,11 @@ export const commandValidateToken = (silent: boolean = false) => {
 };
 
 export const commandUpdateToken = (silent: boolean = false) => {
+	return vscode.window.showQuickPick(['foo', 'bar', 'baz'], { canPickMany: false })
+	.then(option => {
+		console.log({ option });
+		return;
+	});
 	return vscode.window.showInputBox({
 		placeHolder: 'Please input the GitHub OAuth Token',
 	}).then(token => {
@@ -64,3 +70,10 @@ export const commandClearToken = (silent: boolean = false) => {
 		return false;
 	});
 };
+
+export const commandGetBranches = reuseable((owner: string, repo: string) => {
+	if (hasValidToken()) {
+		return getBranches(owner, repo);
+	}
+	return getGitHubBranches(owner, repo);
+});

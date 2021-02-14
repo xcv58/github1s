@@ -66,6 +66,10 @@ export const parseUriWithRest = (uri: vscode.Uri): Promise<UriState> => {
 		.catch(handleRequestError);
 };
 
+export const getGitHubBranches = (owner: string, repo: string) => {
+	return fetch(`https://api.github.com/repos/${owner}/${repo}/branches`)
+		.catch(handleRequestError);
+};
 
 export const readGitHubDirectory = (uri: vscode.Uri) => {
 	return parseUriWithRest(uri).then((state) => {
