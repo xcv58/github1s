@@ -134,6 +134,7 @@ export class WelcomePageContribution implements IWorkbenchContribution {
 		const editor = this.editorService.activeEditor;
 		const filePath = this.getGitHubFilePathOrEmpty(editor?.resource);
 		// if no file opened and the branch is HEAD current, only retain owner and repo in url
+		// TODO: figure out how to get branch name here
 		const windowUrl = !filePath
 			? `/${state.owner}/${state.repo}`
 			: `/${state.owner}/${state.repo}/${filePath ? 'blob' : 'tree'}/branch${filePath}`;
