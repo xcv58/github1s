@@ -4,14 +4,15 @@
  */
 
 import * as vscode from 'vscode';
-import { splitPathByBranchName } from './util';
+import { getNormalizedPath, splitPathByBranchName } from './util';
 import { fetch, RequestError, RequestRateLimitError, RequestInvalidTokenError, RequestNotFoundError, throttledReportNetworkError } from './util/fetch';
 
-interface UriState {
+export interface UriState {
 	owner: string;
 	repo: string;
 	branch: string;
 	path: string;
+	uri: vscode.Uri
 }
 
 export const parseUri = (uri: vscode.Uri): UriState => {
@@ -21,6 +22,7 @@ export const parseUri = (uri: vscode.Uri): UriState => {
 		repo,
 		branch,
 		path: uri.path,
+		uri,
 	};
 };
 
@@ -54,8 +56,11 @@ export const parseUriWithRest = (uri: vscode.Uri): Promise<UriState> => {
 				owner,
 				repo,
 				branch,
-				// path: uri.path === '/' ? uri.path : path
-				path: path
+				// path: uri.path === '/' ? uri.path : path,
+				// path: uri.path,
+				path: getNormalizedPath(uri.path, branch),
+				// path: path,
+				uri,
 			};
 		})
 		.catch(handleRequestError);

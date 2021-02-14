@@ -68,11 +68,14 @@ export class WelcomePageContribution implements IWorkbenchContribution {
 	) {
 
 		const enabled = isWelcomePageEnabled(configurationService, contextService);
+		console.log({ enabled }, lifecycleService.startupKind !== StartupKind.ReloadedWindow);
 		if (enabled && lifecycleService.startupKind !== StartupKind.ReloadedWindow) {
 			const route = parseGitHubUrl(window.location.href);
 			const activeResource = editorService.activeEditor?.resource;
+			console.log({ enabled }, route, { activeResource });
 			if (route.path !== '/' && (!activeResource || activeResource.scheme === 'github1s' || activeResource.path !== route.path)) {
-				const file = URI.from({ scheme: 'github1s', authority: `${route.owner}+${route.repo}`, path: route.path });
+				const file = URI.from({ scheme: 'github1s', authority: `${route.owner}+${route.repo}+${route.path}`, path: route.path });
+				console.log('open file:', { file, route });
 				fileService.resolve(file)
 					.then(() => this.commandService.executeCommand(route.type === 'tree' ? 'revealInExplorer' : 'vscode.open', file))
 					.then(() => this.registerListeners(), () => this.registerListeners());
@@ -118,6 +121,7 @@ export class WelcomePageContribution implements IWorkbenchContribution {
 
 
 	private getGitHubFilePathOrEmpty(uri?: URI): string {
+		console.log('getGitHubFilePathOrEmpty', uri);
 		if (!uri || !uri.path || uri.scheme !== 'github1s') {
 			return '';
 		}
@@ -125,13 +129,14 @@ export class WelcomePageContribution implements IWorkbenchContribution {
 	}
 
 	private doUpdateWindowUrl(): void {
+		// context.globalState.get('github-oauth-token') as string || ''
 		const state = parseGitHubUrl(window.location.href);
 		const editor = this.editorService.activeEditor;
 		const filePath = this.getGitHubFilePathOrEmpty(editor?.resource);
 		// if no file opened and the branch is HEAD current, only retain owner and repo in url
-		const windowUrl = !filePath && state.branch === 'HEAD'
+		const windowUrl = !filePath
 			? `/${state.owner}/${state.repo}`
-			: `/${state.owner}/${state.repo}/${filePath ? 'blob' : 'tree'}/${state.branch}${filePath}`;
+			: `/${state.owner}/${state.repo}/${filePath ? 'blob' : 'tree'}/branch${filePath}`;
 		if (window.history.replaceState) {
 			window.history.replaceState(null, '', windowUrl);
 		}

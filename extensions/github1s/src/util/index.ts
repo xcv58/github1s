@@ -88,3 +88,11 @@ export const splitPathByBranchName = (pathname: string, branchNames: string[]) =
 	}
 	return ['HEAD', '/' + pathname];
 };
+
+export const getNormalizedPath = (path, branch) => {
+	console.log('getNormalizedPath', { path, branch });
+	if (path.startsWith('/tree') || path.startsWith('/blob')) {
+		return path.substring(7 + branch.length);
+	}
+	return path;
+};
