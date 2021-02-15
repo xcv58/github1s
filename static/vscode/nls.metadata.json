@@ -4627,21 +4627,6 @@
 			"invalid.url.fileschema",
 			"invalid.url.schema"
 		],
-		"vs/workbench/services/themes/common/colorExtensionPoint": [
-			"contributes.color",
-			"contributes.color.id",
-			"contributes.color.id.format",
-			"contributes.color.description",
-			"contributes.defaults.light",
-			"contributes.defaults.dark",
-			"contributes.defaults.highContrast",
-			"invalid.colorConfiguration",
-			"invalid.default.colorType",
-			"invalid.id",
-			"invalid.id.format",
-			"invalid.description",
-			"invalid.defaults"
-		],
 		"vs/workbench/services/themes/common/tokenClassificationExtensionPoint": [
 			"contributes.semanticTokenTypes",
 			"contributes.semanticTokenTypes.id",
@@ -4667,6 +4652,21 @@
 			"invalid.semanticTokenScopes.scopes",
 			"invalid.semanticTokenScopes.scopes.value",
 			"invalid.semanticTokenScopes.scopes.selector"
+		],
+		"vs/workbench/services/themes/common/colorExtensionPoint": [
+			"contributes.color",
+			"contributes.color.id",
+			"contributes.color.id.format",
+			"contributes.color.description",
+			"contributes.defaults.light",
+			"contributes.defaults.dark",
+			"contributes.defaults.highContrast",
+			"invalid.colorConfiguration",
+			"invalid.default.colorType",
+			"invalid.id",
+			"invalid.id.format",
+			"invalid.description",
+			"invalid.defaults"
 		],
 		"vs/workbench/contrib/codeEditor/browser/languageConfigurationExtensionPoint": [
 			"parseErrors",
@@ -13186,21 +13186,6 @@
 			"'configuration.jsonValidation.url' is an invalid relative URL: {0}",
 			"'configuration.jsonValidation.url' must be an absolute URL or start with './'  to reference schemas located in the extension."
 		],
-		"vs/workbench/services/themes/common/colorExtensionPoint": [
-			"Contributes extension defined themable colors",
-			"The identifier of the themable color",
-			"Identifiers must only contain letters, digits and dots and can not start with a dot",
-			"The description of the themable color",
-			"The default color for light themes. Either a color value in hex (#RRGGBB[AA]) or the identifier of a themable color which provides the default.",
-			"The default color for dark themes. Either a color value in hex (#RRGGBB[AA]) or the identifier of a themable color which provides the default.",
-			"The default color for high contrast themes. Either a color value in hex (#RRGGBB[AA]) or the identifier of a themable color which provides the default.",
-			"'configuration.colors' must be a array",
-			"{0} must be either a color value in hex (#RRGGBB[AA] or #RGB[A]) or the identifier of a themable color which provides the default.",
-			"'configuration.colors.id' must be defined and can not be empty",
-			"'configuration.colors.id' must only contain letters, digits and dots and can not start with a dot",
-			"'configuration.colors.description' must be defined and can not be empty",
-			"'configuration.colors.defaults' must be defined and must contain 'light', 'dark' and 'highContrast'"
-		],
 		"vs/workbench/services/themes/common/tokenClassificationExtensionPoint": [
 			"Contributes semantic token types.",
 			"The identifier of the semantic token type",
@@ -13226,6 +13211,21 @@
 			"'configuration.semanticTokenScopes.scopes' must be defined as an object",
 			"'configuration.semanticTokenScopes.scopes' values must be an array of strings",
 			"configuration.semanticTokenScopes.scopes': Problems parsing selector {0}."
+		],
+		"vs/workbench/services/themes/common/colorExtensionPoint": [
+			"Contributes extension defined themable colors",
+			"The identifier of the themable color",
+			"Identifiers must only contain letters, digits and dots and can not start with a dot",
+			"The description of the themable color",
+			"The default color for light themes. Either a color value in hex (#RRGGBB[AA]) or the identifier of a themable color which provides the default.",
+			"The default color for dark themes. Either a color value in hex (#RRGGBB[AA]) or the identifier of a themable color which provides the default.",
+			"The default color for high contrast themes. Either a color value in hex (#RRGGBB[AA]) or the identifier of a themable color which provides the default.",
+			"'configuration.colors' must be a array",
+			"{0} must be either a color value in hex (#RRGGBB[AA] or #RGB[A]) or the identifier of a themable color which provides the default.",
+			"'configuration.colors.id' must be defined and can not be empty",
+			"'configuration.colors.id' must only contain letters, digits and dots and can not start with a dot",
+			"'configuration.colors.description' must be defined and can not be empty",
+			"'configuration.colors.defaults' must be defined and must contain 'light', 'dark' and 'highContrast'"
 		],
 		"vs/workbench/contrib/codeEditor/browser/languageConfigurationExtensionPoint": [
 			"Errors parsing {0}: {1}",
