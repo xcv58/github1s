@@ -5,12 +5,16 @@ const fs = require('fs');
 const path = require('path');
 const http = require('http');
 const handler = require('serve-handler');
+const sourcegraphProxyHandler = require('../api/sourcegraph');
 
 const APP_ROOT = path.join(__dirname, '..');
 const options = { public: path.join(APP_ROOT, 'dist'), cleanUrls: false };
 
 const server = http.createServer((request, response) => {
 	const urlObj = url.parse(request.url);
+	if (urlObj.pathname.startsWith('/api/sourcegraph')) {
+		return sourcegraphProxyHandler(request, response);
+	}
 	return fs.access(
 		path.join(APP_ROOT, 'dist', urlObj.pathname),
 		fs.constants.F_OK,
